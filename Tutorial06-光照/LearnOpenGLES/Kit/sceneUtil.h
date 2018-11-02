@@ -2,8 +2,8 @@
 //  sceneUtil.h
 //  LearnOpenGLES
 //
-//  Created by 林伟池 on 16/4/17.
-//  Copyright © 2016年 林伟池. All rights reserved.
+//  Created by loyinglin on 16/4/17.
+//  Copyright © 2016年 loyinglin. All rights reserved.
 //
 
 #import <GLKit/GLKit.h>

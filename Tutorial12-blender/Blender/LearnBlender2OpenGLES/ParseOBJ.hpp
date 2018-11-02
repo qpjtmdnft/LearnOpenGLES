@@ -2,8 +2,8 @@
 //  ParseOBJ.hpp
 //  LearnBlender2OpenGLES
 //
-//  Created by 林伟池 on 16/4/20.
-//  Copyright © 2016年 林伟池. All rights reserved.
+//  Created by loyinglin on 16/4/20.
+//  Copyright © 2016年 loyinglin. All rights reserved.
 //
 
 #ifndef ParseOBJ_hpp

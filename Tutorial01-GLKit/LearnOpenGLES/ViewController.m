@@ -2,8 +2,8 @@
 //  ViewController.m
 //  LearnOpenGLES
 //
-//  Created by 林伟池 on 2018年06月04日；
-//  Copyright © 2016年 林伟池. All rights reserved.
+//  Created by loyinglin on 2018年06月04日；
+//  Copyright © 2016年 loyinglin. All rights reserved.
 //
 
 #import "ViewController.h"

@@ -3,7 +3,7 @@
 //  LearnAVFoundation
 //
 //  Created by loyinglin on 2017/8/22.
-//  Copyright © 2017年 林伟池. All rights reserved.
+//  Copyright © 2017年 loyinglin. All rights reserved.
 //
 
 #import "LYOpenGLManager.h"
