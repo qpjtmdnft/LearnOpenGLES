@@ -43,6 +43,36 @@
     [self render]; 
 }
 
+- (void)setupLayer
+{
+    self.myEagLayer = (CAEAGLLayer*) self.layer;
+    //设置放大倍数
+    [self setContentScaleFactor:[[UIScreen mainScreen] scale]];
+    
+    // CALayer 默认是透明的，必须将它设为不透明才能让其可见
+    self.myEagLayer.opaque = YES;
+    
+    // 设置描绘属性，在这里设置不维持渲染内容以及颜色格式为 RGBA8
+    self.myEagLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:
+                                          [NSNumber numberWithBool:NO], kEAGLDrawablePropertyRetainedBacking, kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];
+}
+
+- (void)setupContext {
+    // 指定 OpenGL 渲染 API 的版本，在这里我们使用 OpenGL ES 2.0
+    EAGLContext* context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+    if (!context) {
+        NSLog(@"Failed to initialize OpenGLES 2.0 context");
+        exit(1);
+    }
+    
+    // 设置为当前上下文
+    if (![EAGLContext setCurrentContext:context]) {
+        NSLog(@"Failed to set current OpenGL context");
+        exit(1);
+    }
+    self.myContext = context;
+}
+
 - (void)render {
     glClearColor(0, 1.0, 0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -74,8 +104,6 @@
         glUseProgram(self.myProgram); //成功便使用，避免由于未使用导致的的bug
     }
     
-    
-
     //前三个是顶点坐标， 后面两个是纹理坐标
     GLfloat attrArr[] =
     {
@@ -163,45 +191,20 @@
     glCompileShader(*shader);
 }
 
-
-
-- (void)setupLayer
-{
-    self.myEagLayer = (CAEAGLLayer*) self.layer;
-    //设置放大倍数
-    [self setContentScaleFactor:[[UIScreen mainScreen] scale]];
-    
-    // CALayer 默认是透明的，必须将它设为不透明才能让其可见
-    self.myEagLayer.opaque = YES;
-    
-    // 设置描绘属性，在这里设置不维持渲染内容以及颜色格式为 RGBA8
-    self.myEagLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:
-                                     [NSNumber numberWithBool:NO], kEAGLDrawablePropertyRetainedBacking, kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];    
-}
-
-
-- (void)setupContext {
-    // 指定 OpenGL 渲染 API 的版本，在这里我们使用 OpenGL ES 2.0
-    EAGLRenderingAPI api = kEAGLRenderingAPIOpenGLES2;
-    EAGLContext* context = [[EAGLContext alloc] initWithAPI:api];
-    if (!context) {
-        NSLog(@"Failed to initialize OpenGLES 2.0 context");
-        exit(1);
-    }
-    
-    // 设置为当前上下文
-    if (![EAGLContext setCurrentContext:context]) {
-        NSLog(@"Failed to set current OpenGL context");
-        exit(1);
-    }
-    self.myContext = context;
-}
-
 - (void)setupRenderBuffer {
+    /**
+     创建一个渲染缓冲对象
+     
+     */
     GLuint buffer;
     glGenRenderbuffers(1, &buffer);
     self.myColorRenderBuffer = buffer;
-    glBindRenderbuffer(GL_RENDERBUFFER, self.myColorRenderBuffer);
+    
+    /**
+     相似地，我们打算把渲染缓冲对象绑定，这样所有后续渲染缓冲操作都会影响到当前的渲染缓冲对象：
+     */
+    glBindRenderbuffer(GL_RENDERBUFFER, buffer);
+    
     // 为 颜色缓冲区 分配存储空间
     [self.myContext renderbufferStorage:GL_RENDERBUFFER fromDrawable:self.myEagLayer];
 }
@@ -213,6 +216,7 @@
     self.myColorFrameBuffer = buffer;
     // 设置为当前 framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, self.myColorFrameBuffer);
+    
     // 将 _colorRenderBuffer 装配到 GL_COLOR_ATTACHMENT0 这个装配点上
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                               GL_RENDERBUFFER, self.myColorRenderBuffer);
@@ -221,14 +225,14 @@
 
 - (void)destoryRenderAndFrameBuffer
 {
+    /**
+     删除帧缓冲对象
+     */
     glDeleteFramebuffers(1, &_myColorFrameBuffer);
     self.myColorFrameBuffer = 0;
     glDeleteRenderbuffers(1, &_myColorRenderBuffer);
     self.myColorRenderBuffer = 0;
 }
-
-
-
 
 - (GLuint)setupTexture:(NSString *)fileName {
     // 1获取图片的CGImageRef
