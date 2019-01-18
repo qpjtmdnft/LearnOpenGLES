@@ -7,10 +7,16 @@
 //
 
 #import "ViewController.h"
+#import "GLImageLoader.h"
 
 @interface ViewController ()
 @property (nonatomic , strong) EAGLContext* mContext;
 @property (nonatomic , strong) GLKBaseEffect* mEffect;
+
+@property (nonatomic, weak) IBOutlet GLKView *glkView;
+
+@property (nonatomic, strong) GLImageLoader *loader;
+
 @end
 
 @implementation ViewController
@@ -19,9 +25,18 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+//    self.view.backgroundColor = [UIColor redColor];
     [self setupConfig];
     [self uploadVertexArray];
     [self uploadTexture];
+    
+    self.loader = [[GLImageLoader alloc] init];
+    self.loader.target = self.glkView;
+}
+
+- (IBAction)onShow:(id)sender {
+    NSString* filePath = [[NSBundle mainBundle] pathForResource:@"for_test" ofType:@"jpg"];
+    [self.loader loadWithFilePath:filePath];
 }
 
 - (void)setupConfig {
